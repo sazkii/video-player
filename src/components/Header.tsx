@@ -7,22 +7,32 @@ interface HeaderProps {
 }
 
 export function Header({ theme, onThemeToggle, onDataSourceOpen }: HeaderProps) {
+  const isDark = theme === 'dark'
+
   return (
-    <header className="flex items-center justify-between px-6 py-4">
+    <header className={`flex items-center justify-between px-6 py-4
+      ${isDark ? 'bg-[#0f0f0f]' : 'bg-white border-b border-gray-200'}`}
+    >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#e94560] rounded-xl flex items-center justify-center">
+        <div className="w-10 h-10 bg-[#e94560] rounded-xl flex items-center justify-center shadow-lg shadow-[#e94560]/20">
           <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
             <polygon points="40,25 40,75 80,50" fill="white"/>
           </svg>
         </div>
-        <h1 className="text-xl font-bold text-white">Video Player</h1>
+        <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          Video Player
+        </h1>
       </div>
+
       <div className="flex items-center gap-2">
         {/* 数据源配置按钮 */}
         <button
           onClick={onDataSourceOpen}
-          className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20
-                     flex items-center gap-2 transition-colors text-sm text-white/80"
+          className={`px-3.5 py-2 rounded-lg flex items-center gap-2 transition-all text-sm font-medium
+            ${isDark
+              ? 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+            }`}
           title="数据源配置"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -32,14 +42,18 @@ export function Header({ theme, onThemeToggle, onDataSourceOpen }: HeaderProps) 
           </svg>
           <span className="hidden sm:inline">数据源</span>
         </button>
+
+        {/* 主题切换按钮 */}
         <button
           onClick={onThemeToggle}
-          className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20
-                     flex items-center justify-center transition-colors
-                     text-white text-lg"
-          title={theme === 'dark' ? '切换到亮色主题' : '切换到暗色主题'}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-lg
+            ${isDark
+              ? 'bg-white/10 hover:bg-white/20'
+              : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          title={isDark ? '切换到亮色主题' : '切换到暗色主题'}
         >
-          {theme === 'dark' ? '☀️' : '🌙'}
+          {isDark ? '☀️' : '🌙'}
         </button>
       </div>
     </header>

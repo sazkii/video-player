@@ -2,8 +2,61 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import Hls from 'hls.js'
 import type { VideoSource, PlaybackRate } from '../types/video'
 import { storage } from '../utils/storage'
+import { buildProxyUrl } from '../utils/proxy'
 
 const PLAYBACK_RATES: PlaybackRate[] = [0.5, 0.75, 1, 1.25, 1.5, 2]
+
+/**
+ * 创建 HLS.js 代理加载器
+ * 拦截所有请求，通过 /__proxy__ 端点绕过 CORS
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createProxyHlsLoader(): any {
+  return {
+    maxRetry: 2,
+    maxRetryDelay: 4000,
+    retryDelay: 1000,
+    timeout: 20000,
+
+    load(context: { url: string; responseType?: string }, _config: unknown, callbacks: {
+      onSuccess: (response: { url: string; data: string | ArrayBuffer; code: number }) => void
+      onError: (error: { code: number; text: string; xhr?: XMLHttpRequest }) => void
+      onTimeout: (stats: unknown) => void
+      onProgress?: (stats: unknown, data: unknown) => void
+    }) {
+      const xhr = new XMLHttpRequest()
+      const originalUrl = context.url
+      const proxyUrl = buildProxyUrl(originalUrl)
+
+      xhr.open('GET', proxyUrl, true)
+      if (context.responseType) {
+        xhr.responseType = context.responseType as XMLHttpRequestResponseType
+      }
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const data = context.responseType === 'arraybuffer' ? xhr.response as ArrayBuffer : xhr.responseText
+          callbacks.onSuccess({
+            url: originalUrl, // 返回原始 URL 给 HLS.js，用于正确解析相对路径
+            data,
+            code: xhr.status,
+          })
+        } else {
+          callbacks.onError({ code: xhr.status, text: xhr.statusText, xhr })
+        }
+      }
+      xhr.onerror = () => callbacks.onError({ code: 0, text: 'Network error', xhr })
+      xhr.ontimeout = () => callbacks.onTimeout({})
+
+      xhr.send()
+
+      return {
+        abort() { xhr.abort() },
+        destroy() { xhr.abort() },
+      }
+    },
+  }
+}
 
 interface UseVideoPlayerOptions {
   autoplay?: boolean
@@ -160,11 +213,15 @@ export function useVideoPlayer(options: UseVideoPlayerOptions = {}) {
 
     if (source.type === 'url' && typeof source.src === 'string') {
       const url = source.src
+      // 使用代理 URL 绕过 CORS 限制
+      const proxyUrl = buildProxyUrl(url)
       // 检查是否是 HLS 流
       if (url.includes('.m3u8') && Hls.isSupported()) {
-        const hls = new Hls()
+        const hls = new Hls({
+          loader: createProxyHlsLoader(),
+        })
         hlsRef.current = hls
-        hls.loadSource(url)
+        hls.loadSource(proxyUrl)
         hls.attachMedia(video)
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           setIsLoading(false)
@@ -178,7 +235,7 @@ export function useVideoPlayer(options: UseVideoPlayerOptions = {}) {
         })
         return
       }
-      video.src = url
+      video.src = proxyUrl
     } else if (source.type === 'file' && source.src instanceof File) {
       const blobURL = URL.createObjectURL(source.src)
       blobURLsRef.current.push(blobURL)

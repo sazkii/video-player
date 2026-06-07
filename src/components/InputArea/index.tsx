@@ -1,7 +1,9 @@
+import type { Theme } from '../../types/video'
 import { DropZone } from './DropZone'
 import { URLInput } from './URLInput'
 
 interface InputAreaProps {
+  theme: Theme
   onFileSelect: (file: File) => void
   onURLSubmit: (url: string) => void
   isLoading: boolean
@@ -9,14 +11,18 @@ interface InputAreaProps {
   onClearError: () => void
 }
 
-export function InputArea({ onFileSelect, onURLSubmit, isLoading, error, onClearError }: InputAreaProps) {
+export function InputArea({ theme, onFileSelect, onURLSubmit, isLoading, error, onClearError }: InputAreaProps) {
+  const isDark = theme === 'dark'
+
   return (
     <div className="w-full max-w-4xl mx-auto px-6 space-y-4">
-      <DropZone onFileSelect={onFileSelect} />
+      <DropZone theme={theme} onFileSelect={onFileSelect} />
 
-      <div className="text-center text-white/20 text-xs">或者</div>
+      <div className={`text-center text-xs ${isDark ? 'text-white/20' : 'text-gray-400'}`}>
+        或者
+      </div>
 
-      <URLInput onSubmit={onURLSubmit} />
+      <URLInput theme={theme} onSubmit={onURLSubmit} />
 
       {isLoading && (
         <div className="text-center text-[#e94560] text-sm">
@@ -31,7 +37,7 @@ export function InputArea({ onFileSelect, onURLSubmit, isLoading, error, onClear
           <span>{error}</span>
           <button
             onClick={onClearError}
-            className="text-white/40 hover:text-white ml-1"
+            className={`ml-1 transition-colors ${isDark ? 'text-white/40 hover:text-white' : 'text-gray-400 hover:text-gray-700'}`}
           >
             ✕
           </button>

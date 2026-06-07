@@ -22,12 +22,16 @@ export default function App() {
   // 派生状态：当前播放源
   const videoSource = playlist[currentIndex] ?? null
 
-  // 主题切换
+  const isDark = theme === 'dark'
+
+  // 主题切换（使用函数式更新避免 stale closure）
   const toggleTheme = useCallback(() => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
-    setTheme(newTheme)
-    storage.savePreferences({ theme: newTheme })
-  }, [theme])
+    setTheme(prev => {
+      const newTheme = prev === 'dark' ? 'light' : 'dark'
+      storage.savePreferences({ theme: newTheme })
+      return newTheme
+    })
+  }, [])
 
   // 文件选择
   const handleFileSelect = useCallback((file: File) => {
@@ -39,7 +43,6 @@ export default function App() {
     }
     setPlaylist(prev => {
       const newPlaylist = [...prev, source]
-      // 新视频添加后自动选中最后一个
       setCurrentIndex(newPlaylist.length - 1)
       return newPlaylist
     })
@@ -70,15 +73,9 @@ export default function App() {
     setPlaylist(prev => {
       const newPlaylist = prev.filter((_, i) => i !== index)
       setCurrentIndex(prevIdx => {
-        if (index < prevIdx) {
-          return prevIdx - 1
-        }
-        if (index === prevIdx && newPlaylist.length > 0) {
-          return Math.min(index, newPlaylist.length - 1)
-        }
-        if (newPlaylist.length === 0) {
-          return 0
-        }
+        if (index < prevIdx) return prevIdx - 1
+        if (index === prevIdx && newPlaylist.length > 0) return Math.min(index, newPlaylist.length - 1)
+        if (newPlaylist.length === 0) return 0
         return prevIdx
       })
       return newPlaylist
@@ -98,7 +95,7 @@ export default function App() {
     const source: VideoSource = {
       id: crypto.randomUUID(),
       type: 'url',
-      name: url.split('/').pop() ?? url,
+      name: decodeURIComponent(url.split('/').pop() ?? url),
       src: url,
     }
     setPlaylist(prev => {
@@ -108,27 +105,45 @@ export default function App() {
     })
   }, [])
 
-  const bgClass = theme === 'dark'
-    ? 'bg-[#0f0f0f] text-white'
-    : 'bg-gray-100 text-gray-900'
-
   return (
-    <div className={`min-h-screen ${bgClass} transition-colors duration-300`}>
+    <div className={`min-h-screen transition-colors duration-300
+      ${isDark ? 'bg-[#0a0a0a] text-white' : 'bg-[#fafafa] text-gray-900'}`}
+    >
       <Header
         theme={theme}
         onThemeToggle={toggleTheme}
         onDataSourceOpen={() => setShowDataSourcePanel(true)}
       />
 
-      <main className="flex flex-col items-center gap-6 pb-8">
+      <main className="flex flex-col items-center gap-6 pb-12 pt-2 px-4">
         {/* 视频播放器 */}
-        <VideoPlayer
-          source={videoSource}
-          onEnded={handleVideoEnded}
-        />
+        <div className="w-full max-w-4xl">
+          <VideoPlayer
+            source={videoSource}
+            onEnded={handleVideoEnded}
+            theme={theme}
+          />
+          {/* 视频信息栏 */}
+          {videoSource && (
+            <div className={`mt-2 px-1 flex items-center gap-2
+              ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              <span className="text-sm truncate font-medium">{videoSource.name}</span>
+              {videoSource.type === 'url' && (
+                <span className={`text-[10px] truncate
+                  ${isDark ? 'text-white/20' : 'text-gray-400'}`}>
+                  {typeof videoSource.src === 'string' ? videoSource.src : ''}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* 输入区域 */}
         <InputArea
+          theme={theme}
           onFileSelect={handleFileSelect}
           onURLSubmit={handleURLSubmit}
           isLoading={false}
@@ -138,11 +153,19 @@ export default function App() {
 
         {/* 播放列表 */}
         <Playlist
+          theme={theme}
           videos={playlist}
           currentIndex={currentIndex}
           onSelect={handleSelectVideo}
           onRemove={handleRemoveVideo}
         />
+
+        {/* 空状态 */}
+        {playlist.length === 0 && (
+          <div className={`text-center py-8 ${isDark ? 'text-white/20' : 'text-gray-400'}`}>
+            <p className="text-sm">选择一个数据源开始播放，或拖入本地文件</p>
+          </div>
+        )}
       </main>
 
       {/* 数据源配置面板 */}
@@ -150,6 +173,7 @@ export default function App() {
         isOpen={showDataSourcePanel}
         onClose={() => setShowDataSourcePanel(false)}
         onSelect={handleDataSourceSelect}
+        theme={theme}
       />
     </div>
   )
