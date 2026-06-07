@@ -25,8 +25,12 @@ export function VideoPlayer({ source, onEnded, theme }: VideoPlayerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source])
 
-  // 双击全屏
+  // 双击全屏（先取消待执行的单击定时器）
   const handleDoubleClick = useCallback(() => {
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current)
+      clickTimerRef.current = null
+    }
     player.toggleFullscreen()
   }, [player])
 
@@ -41,6 +45,7 @@ export function VideoPlayer({ source, onEnded, theme }: VideoPlayerProps) {
 
   const handleClick = useCallback(() => {
     if (clickTimerRef.current) {
+      // 250ms 内再次点击 = 双击，取消单击操作
       clearTimeout(clickTimerRef.current)
       clickTimerRef.current = null
       return

@@ -36,11 +36,11 @@ export const PRESET_DATA_SOURCES: DataSource[] = [
   {
     id: 'preset-archive-tears',
     name: 'Tears of Steel',
-    url: 'https://archive.org/download/TearsOfSteel-movie-4k/tears_of_steel_4k.mov',
+    url: 'https://ftp.nluug.nl/pub/graphics/blender/demo/movies/ToS/tears_of_steel_720p.mov',
     category: 'mp4',
     format: 'other',
-    description: 'Archive.org 提供，科幻真人+CG短片',
-    resolution: '4K',
+    description: 'Blender Foundation 镜像源，科幻真人+CG短片，720p',
+    resolution: '720p',
   },
 
   // ─── HLS 流（Apple 官方 CDN，通过代理可播放） ─────────────────────────────
