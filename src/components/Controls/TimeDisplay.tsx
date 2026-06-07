@@ -7,7 +7,7 @@ interface TimeDisplayProps {
 
 export function TimeDisplay({ currentTime, duration }: TimeDisplayProps) {
   return (
-    <span className="text-sm text-white/80 font-mono whitespace-nowrap select-none">
+    <span className="text-[12px] text-white/60 font-mono whitespace-nowrap select-none ml-1">
       {formatTime(currentTime)} / {formatTime(duration)}
     </span>
   )

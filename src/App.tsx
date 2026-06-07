@@ -1,30 +1,29 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { Theme, VideoSource } from './types/video'
 import { storage } from './utils/storage'
 import { Header } from './components/Header'
 import { VideoPlayer } from './components/VideoPlayer'
-import { InputArea } from './components/InputArea'
 import { Playlist } from './components/Playlist'
 import { DataSourcePanel } from './components/DataSourcePanel'
 
 export default function App() {
-  // 主题状态
   const prefs = storage.getPreferences()
   const [theme, setTheme] = useState<Theme>(prefs.theme)
 
-  // 播放列表和当前索引
+  // 主题同步：监听 storage 变化（其他标签页切换时同步）
+  useEffect(() => {
+    const current = storage.getPreferences().theme
+    if (current !== theme) setTheme(current)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const [playlist, setPlaylist] = useState<VideoSource[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-
-  // 数据源面板状态
   const [showDataSourcePanel, setShowDataSourcePanel] = useState(false)
+  const [showURLInput, setShowURLInput] = useState(false)
 
-  // 派生状态：当前播放源
   const videoSource = playlist[currentIndex] ?? null
-
   const isDark = theme === 'dark'
 
-  // 主题切换（使用函数式更新避免 stale closure）
   const toggleTheme = useCallback(() => {
     setTheme(prev => {
       const newTheme = prev === 'dark' ? 'light' : 'dark'
@@ -33,27 +32,11 @@ export default function App() {
     })
   }, [])
 
-  // 文件选择
-  const handleFileSelect = useCallback((file: File) => {
-    const source: VideoSource = {
-      id: crypto.randomUUID(),
-      type: 'file',
-      name: file.name,
-      src: file,
-    }
-    setPlaylist(prev => {
-      const newPlaylist = [...prev, source]
-      setCurrentIndex(newPlaylist.length - 1)
-      return newPlaylist
-    })
-  }, [])
-
-  // URL提交
   const handleURLSubmit = useCallback((url: string) => {
     const source: VideoSource = {
       id: crypto.randomUUID(),
       type: 'url',
-      name: url.split('/').pop() ?? url,
+      name: decodeURIComponent(url.split('/').pop() ?? url),
       src: url,
     }
     setPlaylist(prev => {
@@ -61,14 +44,13 @@ export default function App() {
       setCurrentIndex(newPlaylist.length - 1)
       return newPlaylist
     })
+    setShowURLInput(false)
   }, [])
 
-  // 播放列表选择
   const handleSelectVideo = useCallback((index: number) => {
     setCurrentIndex(index)
   }, [])
 
-  // 从播放列表移除
   const handleRemoveVideo = useCallback((index: number) => {
     setPlaylist(prev => {
       const newPlaylist = prev.filter((_, i) => i !== index)
@@ -82,7 +64,6 @@ export default function App() {
     })
   }, [])
 
-  // 播放结束，播放下一个
   const handleVideoEnded = useCallback(() => {
     setCurrentIndex(prev => {
       const nextIdx = prev + 1
@@ -90,7 +71,6 @@ export default function App() {
     })
   }, [playlist.length])
 
-  // 从数据源面板选择播放
   const handleDataSourceSelect = useCallback((url: string) => {
     const source: VideoSource = {
       id: crypto.randomUUID(),
@@ -115,41 +95,79 @@ export default function App() {
         onDataSourceOpen={() => setShowDataSourcePanel(true)}
       />
 
-      <main className="flex flex-col items-center gap-6 pb-12 pt-2 px-4">
-        {/* 视频播放器 */}
-        <div className="w-full max-w-4xl">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-16 space-y-8">
+        {/* 视频播放器区域 */}
+        <section className="max-w-5xl mx-auto">
           <VideoPlayer
             source={videoSource}
             onEnded={handleVideoEnded}
             theme={theme}
           />
-          {/* 视频信息栏 */}
+
+          {/* 视频标题栏 */}
           {videoSource && (
-            <div className={`mt-2 px-1 flex items-center gap-2
-              ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-              <span className="text-sm truncate font-medium">{videoSource.name}</span>
-              {videoSource.type === 'url' && (
-                <span className={`text-[10px] truncate
-                  ${isDark ? 'text-white/20' : 'text-gray-400'}`}>
-                  {typeof videoSource.src === 'string' ? videoSource.src : ''}
-                </span>
-              )}
+            <div className="mt-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-1 h-5 bg-[#e94560] rounded-full flex-shrink-0" />
+                <h2 className={`text-sm font-medium truncate
+                  ${isDark ? 'text-white/85' : 'text-gray-800'}`}>
+                  {videoSource.name}
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowURLInput(!showURLInput)}
+                className={`flex-shrink-0 h-8 px-3 rounded-full text-xs flex items-center gap-1.5 transition-all
+                  ${isDark
+                    ? 'bg-white/[0.06] hover:bg-white/[0.12] text-white/50 hover:text-white/80'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                添加
+              </button>
             </div>
           )}
-        </div>
 
-        {/* 输入区域 */}
-        <InputArea
-          theme={theme}
-          onFileSelect={handleFileSelect}
-          onURLSubmit={handleURLSubmit}
-          isLoading={false}
-          error={null}
-          onClearError={() => {}}
-        />
+          {/* 内联 URL 输入 */}
+          {showURLInput && (
+            <div className="mt-3">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  const form = e.target as HTMLFormElement
+                  const input = form.elements.namedItem('urlInput') as HTMLInputElement
+                  if (input?.value.trim()) {
+                    handleURLSubmit(input.value.trim())
+                    input.value = ''
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  name="urlInput"
+                  type="url"
+                  placeholder="输入视频 URL (mp4, webm, m3u8...)"
+                  className={`flex-1 h-9 px-4 rounded-full text-sm border outline-none transition-colors
+                    ${isDark
+                      ? 'bg-white/[0.04] border-white/[0.08] text-white placeholder-white/25 focus:border-[#e94560]/50'
+                      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-[#e94560]/50'
+                    }`}
+                />
+                <button
+                  type="submit"
+                  className="h-9 px-5 bg-[#e94560] hover:bg-[#e94560]/85 text-white text-sm
+                             font-medium rounded-full transition-colors"
+                >
+                  播放
+                </button>
+              </form>
+            </div>
+          )}
+        </section>
 
         {/* 播放列表 */}
         <Playlist
@@ -162,13 +180,25 @@ export default function App() {
 
         {/* 空状态 */}
         {playlist.length === 0 && (
-          <div className={`text-center py-8 ${isDark ? 'text-white/20' : 'text-gray-400'}`}>
-            <p className="text-sm">选择一个数据源开始播放，或拖入本地文件</p>
-          </div>
+          <section className="text-center py-20">
+            <div className={`w-20 h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center
+              ${isDark ? 'bg-white/[0.04]' : 'bg-gray-100'}`}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke={isDark ? 'rgba(255,255,255,0.15)' : '#d1d5db'} strokeWidth="1.5"
+                strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            </div>
+            <p className={`text-sm mb-1 ${isDark ? 'text-white/35' : 'text-gray-400'}`}>
+              点击「数据源」选择视频开始播放
+            </p>
+            <p className={`text-xs ${isDark ? 'text-white/18' : 'text-gray-300'}`}>
+              支持拖拽本地文件或粘贴在线视频 URL
+            </p>
+          </section>
         )}
       </main>
 
-      {/* 数据源配置面板 */}
       <DataSourcePanel
         isOpen={showDataSourcePanel}
         onClose={() => setShowDataSourcePanel(false)}

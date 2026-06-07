@@ -376,6 +376,16 @@ export function useVideoPlayer(options: UseVideoPlayerOptions = {}) {
           e.preventDefault()
           togglePlay()
           break
+        case 'j':
+        case 'J':
+          e.preventDefault()
+          skip(-10)
+          break
+        case 'l':
+        case 'L':
+          e.preventDefault()
+          skip(10)
+          break
         case 'ArrowLeft':
           e.preventDefault()
           skip(-5)

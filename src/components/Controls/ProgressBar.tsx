@@ -57,7 +57,6 @@ export function ProgressBar({ currentTime, duration, buffered, onSeek }: Progres
     setHoverTime(null)
   }, [])
 
-  // 清理拖拽状态（组件卸载时）
   useEffect(() => {
     return () => {
       isDraggingRef.current = false
@@ -72,27 +71,27 @@ export function ProgressBar({ currentTime, duration, buffered, onSeek }: Progres
   return (
     <div
       ref={barRef}
-      className="relative w-full h-6 flex items-center cursor-pointer group"
+      className="relative w-full h-5 flex items-center cursor-pointer group/prog"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* 进度条轨道 */}
-      <div className="w-full h-1 bg-white/20 rounded-full group-hover:h-1.5 transition-all relative">
+      <div className="w-full h-[3px] bg-white/15 rounded-full group-hover/prog:h-[5px] transition-all relative">
         {/* 缓冲区 */}
         <div
-          className="absolute h-full bg-white/30 rounded-full"
+          className="absolute h-full bg-white/20 rounded-full"
           style={{ width: `${bufferProgress}%` }}
         />
         {/* 播放进度 */}
         <div
-          className="absolute h-full bg-[#e94560] rounded-full"
+          className="absolute h-full bg-[#e94560] rounded-full transition-none"
           style={{ width: `${progress}%` }}
         />
         {/* 拖拽手柄 */}
         <div
-          className="absolute w-3 h-3 bg-[#e94560] rounded-full -translate-x-1/2
-                     opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+          className="absolute w-3.5 h-3.5 bg-white rounded-full -translate-x-1/2 top-1/2 -translate-y-1/2
+                     opacity-0 group-hover/prog:opacity-100 transition-opacity shadow-md shadow-black/30"
           style={{ left: `${progress}%` }}
         />
       </div>
@@ -100,8 +99,8 @@ export function ProgressBar({ currentTime, duration, buffered, onSeek }: Progres
       {/* Hover 时间提示 */}
       {hoverTime !== null && (
         <div
-          className="absolute -top-8 px-2 py-1 bg-black/90 text-white text-xs rounded
-                     pointer-events-none -translate-x-1/2 whitespace-nowrap"
+          className="absolute -top-7 px-2 py-0.5 bg-[#1a1a1a] text-white text-[11px] rounded-md
+                     pointer-events-none -translate-x-1/2 whitespace-nowrap font-mono shadow-lg"
           style={{ left: hoverX }}
         >
           {formatTime(hoverTime)}
