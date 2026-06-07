@@ -5,6 +5,7 @@ import { Header } from './components/Header'
 import { VideoPlayer } from './components/VideoPlayer'
 import { InputArea } from './components/InputArea'
 import { Playlist } from './components/Playlist'
+import { DataSourcePanel } from './components/DataSourcePanel'
 
 export default function App() {
   // 主题状态
@@ -14,6 +15,9 @@ export default function App() {
   // 播放列表和当前索引
   const [playlist, setPlaylist] = useState<VideoSource[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+
+  // 数据源面板状态
+  const [showDataSourcePanel, setShowDataSourcePanel] = useState(false)
 
   // 派生状态：当前播放源
   const videoSource = playlist[currentIndex] ?? null
@@ -89,13 +93,32 @@ export default function App() {
     })
   }, [playlist.length])
 
+  // 从数据源面板选择播放
+  const handleDataSourceSelect = useCallback((url: string) => {
+    const source: VideoSource = {
+      id: crypto.randomUUID(),
+      type: 'url',
+      name: url.split('/').pop() ?? url,
+      src: url,
+    }
+    setPlaylist(prev => {
+      const newPlaylist = [...prev, source]
+      setCurrentIndex(newPlaylist.length - 1)
+      return newPlaylist
+    })
+  }, [])
+
   const bgClass = theme === 'dark'
     ? 'bg-[#0f0f0f] text-white'
     : 'bg-gray-100 text-gray-900'
 
   return (
     <div className={`min-h-screen ${bgClass} transition-colors duration-300`}>
-      <Header theme={theme} onThemeToggle={toggleTheme} />
+      <Header
+        theme={theme}
+        onThemeToggle={toggleTheme}
+        onDataSourceOpen={() => setShowDataSourcePanel(true)}
+      />
 
       <main className="flex flex-col items-center gap-6 pb-8">
         {/* 视频播放器 */}
@@ -121,6 +144,13 @@ export default function App() {
           onRemove={handleRemoveVideo}
         />
       </main>
+
+      {/* 数据源配置面板 */}
+      <DataSourcePanel
+        isOpen={showDataSourcePanel}
+        onClose={() => setShowDataSourcePanel(false)}
+        onSelect={handleDataSourceSelect}
+      />
     </div>
   )
 }

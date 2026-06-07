@@ -1,8 +1,9 @@
-import type { PlaybackRate, Theme } from '../types/video'
+import type { PlaybackRate, Theme, DataSource } from '../types/video'
 
 const STORAGE_KEYS = {
   PREFERENCES: 'video-player-prefs',
   URL_HISTORY: 'video-player-url-history',
+  DATA_SOURCES: 'video-player-data-sources',
 } as const
 
 interface StoredPreferences {
@@ -63,5 +64,55 @@ export const storage = {
   /** 清除URL历史 */
   clearURLHistory(): void {
     safeSet(STORAGE_KEYS.URL_HISTORY, [])
+  },
+
+  /** ─── 数据源管理 ──────────────────────────────────────────────────────── */
+
+  /** 获取用户自定义数据源列表 */
+  getDataSources(): DataSource[] {
+    return safeGet<DataSource[]>(STORAGE_KEYS.DATA_SOURCES, [])
+  },
+
+  /** 添加自定义数据源 */
+  addDataSource(source: DataSource): void {
+    const sources = storage.getDataSources()
+    // 按 id 去重
+    if (sources.some(s => s.id === source.id)) return
+    sources.push(source)
+    safeSet(STORAGE_KEYS.DATA_SOURCES, sources)
+  },
+
+  /** 更新数据源（按 id） */
+  updateDataSource(id: string, updates: Partial<DataSource>): void {
+    const sources = storage.getDataSources()
+    const idx = sources.findIndex(s => s.id === id)
+    if (idx === -1) return
+    const existing = sources[idx]!
+    sources[idx] = {
+      id,
+      name: updates.name ?? existing.name,
+      url: updates.url ?? existing.url,
+      category: updates.category ?? existing.category,
+      format: updates.format ?? existing.format,
+      description: updates.description ?? existing.description,
+      resolution: updates.resolution ?? existing.resolution,
+    }
+    safeSet(STORAGE_KEYS.DATA_SOURCES, sources)
+  },
+
+  /** 删除数据源（按 id） */
+  removeDataSource(id: string): void {
+    const sources = storage.getDataSources().filter(s => s.id !== id)
+    safeSet(STORAGE_KEYS.DATA_SOURCES, sources)
+  },
+
+  /** 清除所有自定义数据源 */
+  clearDataSources(): void {
+    safeSet(STORAGE_KEYS.DATA_SOURCES, [])
+  },
+
+  /** 合并预设 + 自定义数据源（自定义在前，便于浏览） */
+  getAllDataSources(presets: DataSource[]): DataSource[] {
+    return [...storage.getDataSources(), ...presets]
   },
 }

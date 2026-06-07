@@ -11,6 +11,22 @@ export interface VideoSource {
   thumbnail?: string
 }
 
+/** 数据源分类 */
+export type DataSourceCategory = 'preset' | 'hls' | 'mp4' | 'custom'
+
+/** 第三方数据源配置 */
+export interface DataSource {
+  id: string
+  name: string
+  url: string
+  category: DataSourceCategory
+  description?: string
+  /** 数据源类型标识 */
+  format: 'mp4' | 'webm' | 'm3u8' | 'other'
+  /** 分辨率（如 '1080p', '4K'） */
+  resolution?: string
+}
+
 /** 播放器状态 */
 export interface PlayerState {
   isPlaying: boolean
