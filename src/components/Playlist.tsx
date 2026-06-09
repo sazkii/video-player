@@ -70,11 +70,11 @@ export function Playlist({ theme, videos, currentIndex, onSelect, onRemove }: Pl
               {/* 缩略图占位 */}
               <div className={`relative w-full aspect-video flex items-center justify-center
                 ${isActive
-                  ? isDark ? 'bg-[#ff0000]/10' : 'bg-[#ff0000]/5'
+                  ? isDark ? 'bg-accent/10' : 'bg-accent/5'
                   : isDark ? 'bg-white/[0.03]' : 'bg-gray-100'
                 }`}>
                 {isActive ? (
-                  <div className="w-9 h-9 bg-[#ff0000]/80 rounded-full flex items-center justify-center
+                  <div className="w-9 h-9 bg-accent/80 rounded-full flex items-center justify-center
                                   shadow-lg shadow-[#ff0000]/20">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
                       <polygon points="8,5 8,19 19,12" />

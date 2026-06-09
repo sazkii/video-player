@@ -25,7 +25,7 @@ export default function NextEpisodeOverlay({ nextEpisodeName, onPlay, onCancel }
 
   return (
     <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-30">
-      <div className="bg-[#1a1a1a] rounded-2xl p-6 flex flex-col items-center gap-4 max-w-xs">
+      <div className="bg-surface-2 rounded-2xl p-6 flex flex-col items-center gap-4 max-w-xs">
         <p className="text-white/70 text-sm text-center">
           即将播放下一集
         </p>
@@ -60,7 +60,7 @@ export default function NextEpisodeOverlay({ nextEpisodeName, onPlay, onCancel }
           </button>
           <button
             onClick={onPlay}
-            className="flex-1 py-2 rounded-xl bg-[#ff0000] text-white text-sm font-medium hover:bg-[#ff0000]/80 transition-colors"
+            className="flex-1 py-2 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/80 transition-colors"
           >
             立即播放
           </button>

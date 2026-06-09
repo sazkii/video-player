@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
+import { Home, Heart, Clock, Settings, Menu } from 'lucide-react'
 
 /** YouTube 风格侧边导航 */
 export function SideNav({ expanded, onToggle }: { expanded: boolean; onToggle: () => void }) {
@@ -8,48 +9,31 @@ export function SideNav({ expanded, onToggle }: { expanded: boolean; onToggle: (
 
   const mainItems = [
     { to: '/', label: '首页', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? 'white' : 'none'} stroke="white" strokeWidth={active ? '0' : '1.5'}>
-        {active
-          ? <path d="M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4z" />
-          : <path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
-        }
-      </svg>
+      <Home className={`h-5 w-5 ${active ? 'text-white fill-white' : 'text-white/60'}`} />
     )},
     { to: '/favorites', label: '收藏', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? 'white' : 'none'} stroke="white" strokeWidth="1.5">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-      </svg>
+      <Heart className={`h-5 w-5 ${active ? 'text-white fill-white' : 'text-white/60'}`} />
     )},
     { to: '/history', label: '历史', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="9" />
-        <polyline points="12 7 12 12 15.5 14" strokeLinecap="round" />
-        {active && <circle cx="12" cy="12" r="9" fill="white" fillOpacity="0.15" />}
-      </svg>
+      <Clock className={`h-5 w-5 ${active ? 'text-white' : 'text-white/60'}`} />
     )},
   ]
 
   const libraryItems = [
     { to: '/settings', label: '设置', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-        {active && <circle cx="12" cy="12" r="9" fill="white" fillOpacity="0.15" />}
-      </svg>
+      <Settings className={`h-5 w-5 ${active ? 'text-white' : 'text-white/60'}`} />
     )},
   ]
 
   const navWidth = expanded ? 'w-60' : 'w-[72px]'
 
   return (
-    <nav className={`hidden md:flex flex-col ${navWidth} fixed top-0 left-0 h-full bg-[#212121] z-40
+    <nav className={`hidden md:flex flex-col ${navWidth} fixed top-0 left-0 h-full bg-surface-3 z-40
       overflow-y-auto overflow-x-hidden transition-all duration-200`}>
       {/* 顶部：菜单按钮 + Logo */}
-      <div className={`flex items-center ${expanded ? 'px-3' : 'justify-center'} h-14 gap-6 sticky top-0 bg-[#212121] z-10`}>
+      <div className={`flex items-center ${expanded ? 'px-3' : 'justify-center'} h-14 gap-6 sticky top-0 bg-surface-3 z-10`}>
         <button onClick={onToggle} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
-          </svg>
+          <Menu className="h-5 w-5 text-white" />
         </button>
         {expanded && (
           <div className="flex items-center gap-0.5">
@@ -77,12 +61,12 @@ export function SideNav({ expanded, onToggle }: { expanded: boolean; onToggle: (
             >
               {item.icon(isActive)}
               {expanded && (
-                <span className={`text-sm whitespace-nowrap ${isActive ? 'font-medium text-white' : 'text-[#f1f1f1]'}`}>
+                <span className={`text-sm whitespace-nowrap ${isActive ? 'font-medium text-white' : 'text-text-primary'}`}>
                   {item.label}
                 </span>
               )}
               {!expanded && (
-                <div className="absolute left-full ml-3 px-2.5 py-1 bg-[#606060] text-white text-xs rounded
+                <div className="absolute left-full ml-3 px-2.5 py-1 bg-surface-8 text-white text-xs rounded
                   whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
                   {item.label}
                 </div>
@@ -99,7 +83,7 @@ export function SideNav({ expanded, onToggle }: { expanded: boolean; onToggle: (
       <div className={`py-3 ${expanded ? 'px-3' : 'px-0'}`}>
         {expanded && (
           <div className="px-3 py-2 mb-1">
-            <span className="text-sm font-medium text-[#f1f1f1]">设置</span>
+            <span className="text-sm font-medium text-text-primary">设置</span>
           </div>
         )}
         {libraryItems.map(item => {
@@ -113,12 +97,12 @@ export function SideNav({ expanded, onToggle }: { expanded: boolean; onToggle: (
             >
               {item.icon(isActive)}
               {expanded && (
-                <span className={`text-sm whitespace-nowrap ${isActive ? 'font-medium text-white' : 'text-[#f1f1f1]'}`}>
+                <span className={`text-sm whitespace-nowrap ${isActive ? 'font-medium text-white' : 'text-text-primary'}`}>
                   {item.label}
                 </span>
               )}
               {!expanded && (
-                <div className="absolute left-full ml-3 px-2.5 py-1 bg-[#606060] text-white text-xs rounded
+                <div className="absolute left-full ml-3 px-2.5 py-1 bg-surface-8 text-white text-xs rounded
                   whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
                   {item.label}
                 </div>
@@ -138,36 +122,21 @@ export function BottomNav() {
 
   const items = [
     { to: '/', label: '首页', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? 'white' : 'none'} stroke="white" strokeWidth={active ? '0' : '1.5'}>
-        {active
-          ? <path d="M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4z" />
-          : <path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
-        }
-      </svg>
+      <Home className={`h-5 w-5 ${active ? 'text-white fill-white' : 'text-white/60'}`} />
     )},
     { to: '/favorites', label: '收藏', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? 'white' : 'none'} stroke="white" strokeWidth="1.5">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-      </svg>
+      <Heart className={`h-5 w-5 ${active ? 'text-white fill-white' : 'text-white/60'}`} />
     )},
     { to: '/history', label: '历史', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="9" />
-        <polyline points="12 7 12 12 15.5 14" strokeLinecap="round" />
-        {active && <circle cx="12" cy="12" r="9" fill="white" fillOpacity="0.15" />}
-      </svg>
+      <Clock className={`h-5 w-5 ${active ? 'text-white' : 'text-white/60'}`} />
     )},
     { to: '/settings', label: '设置', icon: (active: boolean) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-        {active && <circle cx="12" cy="12" r="9" fill="white" fillOpacity="0.15" />}
-      </svg>
+      <Settings className={`h-5 w-5 ${active ? 'text-white' : 'text-white/60'}`} />
     )},
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#212121] border-t border-white/10 z-50 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 bg-surface-3 border-t border-white/10 z-50 md:hidden">
       <div className="flex items-center justify-around h-14">
         {items.map(item => {
           const isActive = item.to === '/'
@@ -178,7 +147,7 @@ export function BottomNav() {
               key={item.to}
               to={item.to}
               end={item.to === '/'}
-              className="flex flex-col items-center gap-1 text-[10px] text-[#f1f1f1] min-w-[48px]"
+              className="flex flex-col items-center gap-1 text-[10px] text-text-primary min-w-[48px]"
             >
               {item.icon(isActive)}
               <span>{item.label}</span>

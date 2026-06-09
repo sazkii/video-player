@@ -64,23 +64,23 @@ export default function HistoryPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#f1f1f1] truncate">{item.title}</p>
+                  <p className="text-sm font-medium text-text-primary truncate">{item.title}</p>
                   {item.episode_name && (
-                    <p className="text-xs text-[#aaa] mt-0.5">{item.episode_name}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{item.episode_name}</p>
                   )}
                   <div className="flex items-center gap-2 mt-2">
                     <div className="flex-1 h-1 bg-white/10 rounded-full">
                       <div
-                        className="h-full bg-[#ff0000] rounded-full"
+                        className="h-full bg-accent rounded-full"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-[#aaa] whitespace-nowrap">
+                    <span className="text-[10px] text-text-secondary whitespace-nowrap">
                       {formatDuration(item.current_time)} / {formatDuration(item.duration)}
                     </span>
                   </div>
                 </div>
-                <span className="text-[11px] text-[#aaa] whitespace-nowrap hidden sm:block">
+                <span className="text-[11px] text-text-secondary whitespace-nowrap hidden sm:block">
                   {timeAgo(item.updated_at)}
                 </span>
               </button>

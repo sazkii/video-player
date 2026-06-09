@@ -29,7 +29,7 @@ export default function EpisodeSidebar({ episodes, currentIndex, onSelect, onClo
       <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
         <div className="absolute inset-0 bg-black/60" />
         <div
-          className="relative w-full max-h-[60vh] bg-[#141414] rounded-t-2xl overflow-hidden
+          className="relative w-full max-h-[60vh] bg-surface-1 rounded-t-2xl overflow-hidden
                      animate-[slideUp_0.25s_ease-out]"
           onClick={e => e.stopPropagation()}
         >
@@ -44,7 +44,7 @@ export default function EpisodeSidebar({ episodes, currentIndex, onSelect, onClo
                 onClick={() => handleSelect(i)}
                 className={`rounded-lg py-2.5 px-1 text-xs text-center truncate transition-colors
                   ${i === currentIndex
-                    ? 'bg-[#ff0000] text-white'
+                    ? 'bg-accent text-white'
                     : 'bg-white/[0.06] text-white/60 hover:bg-white/[0.12]'
                   }`}
               >
@@ -71,7 +71,7 @@ export default function EpisodeSidebar({ episodes, currentIndex, onSelect, onClo
             onClick={() => handleSelect(i)}
             className={`rounded-lg py-2.5 px-1 text-xs text-center truncate transition-colors
               ${i === currentIndex
-                ? 'bg-[#ff0000] text-white'
+                ? 'bg-accent text-white'
                 : 'bg-white/[0.06] text-white/60 hover:bg-white/[0.12]'
               }`}
           >
