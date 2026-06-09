@@ -4,3 +4,8 @@ dist/
 *.local
 server/data.db
 server/.env
+.claude/
+docs/
+CLAUDE.md
+PROJECT.md
+tsconfig.tsbuildinfo
