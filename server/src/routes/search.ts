@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { getEnabledAdapters } from '../adapters/registry.js'
+import { getCmsSourcesFromEnv } from '../config.js'
 
 const router = Router()
 
@@ -115,17 +116,13 @@ router.get('/sources-all', async (req, res) => {
     return
   }
 
-  // 直接查询各 CMS API 获取播放地址
-  const CMS_APIS: Array<{ id: string; name: string; apiUrl: string }> = [
-    { id: 'guangsuapi', name: '光速资源', apiUrl: 'https://api.guangsuapi.com/api.php/provide/vod' },
-    { id: 'sdzyapi', name: '闪电资源', apiUrl: 'https://sdzyapi.com/api.php/provide/vod' },
-    { id: 'hongniuzy2', name: '红牛资源', apiUrl: 'https://www.hongniuzy2.com/api.php/provide/vod' },
-    { id: 'heiycloud', name: '非凡资源', apiUrl: 'https://heiycloud.com/api.php/provide/vod' },
-    { id: 'tiankongapi', name: '天空资源', apiUrl: 'https://m3u8.tiankongapi.com/api.php/provide/vod' },
-  ].filter(s => s.id !== excludeSite)
+  // 从环境变量获取 CMS API 列表
+  const cmsSources = getCmsSourcesFromEnv()
+    .filter(s => s.id !== excludeSite)
+    .map(s => ({ id: s.id, name: s.name, apiUrl: s.cmsApiUrl }))
 
   const results = await Promise.allSettled(
-    CMS_APIS.map(async (cms) => {
+    cmsSources.map(async (cms) => {
       try {
         const apiUrl = `${cms.apiUrl}?ac=detail&ids=${videoId}`
         const r = await fetch(apiUrl, {

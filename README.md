@@ -116,13 +116,9 @@ video-player/
 - 详情：`GET ?ac=detail&ids=视频ID`
 - 播放地址格式：`剧集名$url#剧集名$url#...`
 
-### 已验证数据源
+### 配置数据源
 
-| ID | 名称 | API 地址 |
-|----|------|----------|
-| lziapi | 量子资源 | `cj.lziapi.com/api.php/provide/vod` |
-| guangsuapi | 光速资源 | `api.guangsuapi.com/api.php/provide/vod` |
-| hongniuzy2 | 红牛资源 | `www.hongniuzy2.com/api.php/provide/vod` |
+在 `server/.env` 文件中配置 CMS API 地址（参考 `.env.example`）。
 
 ## 播放器功能
 

@@ -3,6 +3,7 @@ import { initDB, queryAll } from './db/index.js'
 import { registerAdapter } from './adapters/registry.js'
 import { GenericCollectorAdapter } from './adapters/generic-collector.js'
 import { LziApiCmsAdapter } from './adapters/lziapi-cms.js'
+import { getCmsSourcesFromEnv } from './config.js'
 import os from 'os'
 
 const PORT = Number(process.env.PORT ?? 3000)
@@ -32,20 +33,16 @@ async function main() {
     // 首次运行
   }
 
-  // 内置 CMS API 适配器列表
-  const BUILTIN_CMS_SOURCES: Array<{ id: string; name: string; cmsApiUrl: string }> = [
-    { id: 'lziapi', name: '量子资源', cmsApiUrl: 'https://cj.lziapi.com/api.php/provide/vod' },
-    { id: 'guangsuapi', name: '光速资源', cmsApiUrl: 'https://api.guangsuapi.com/api.php/provide/vod' },
-    { id: 'sdzyapi', name: '闪电资源', cmsApiUrl: 'https://sdzyapi.com/api.php/provide/vod' },
-    { id: 'hongniuzy2', name: '红牛资源', cmsApiUrl: 'https://www.hongniuzy2.com/api.php/provide/vod' },
-    { id: 'heiycloud', name: '非凡资源', cmsApiUrl: 'https://heiycloud.com/api.php/provide/vod' },
-    { id: 'tiankongapi', name: '天空资源', cmsApiUrl: 'https://m3u8.tiankongapi.com/api.php/provide/vod' },
-  ]
-
-  for (const source of BUILTIN_CMS_SOURCES) {
+  // 从环境变量加载 CMS 数据源
+  const builtinSources = getCmsSourcesFromEnv()
+  for (const source of builtinSources) {
     registerAdapter(new LziApiCmsAdapter({ ...source, enabled: true }))
   }
-  console.log(`[Adapters] 已注册 ${BUILTIN_CMS_SOURCES.length} 个内置 CMS 数据源`)
+  if (builtinSources.length > 0) {
+    console.log(`[Adapters] 已注册 ${builtinSources.length} 个内置 CMS 数据源`)
+  } else {
+    console.log('[Adapters] 未配置内置 CMS 数据源（参考 server/.env.example）')
+  }
 
   // 启动服务器
   app.listen(PORT, '0.0.0.0', () => {
