@@ -25,7 +25,7 @@ export function InputArea({ theme, onFileSelect, onURLSubmit, isLoading, error, 
       <URLInput theme={theme} onSubmit={onURLSubmit} />
 
       {isLoading && (
-        <div className="text-center text-[#e94560] text-sm">
+        <div className="text-center text-[#ff0000] text-sm">
           <span className="inline-block animate-spin mr-2">⏳</span>
           加载中...
         </div>

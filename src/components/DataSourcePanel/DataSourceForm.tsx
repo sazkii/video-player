@@ -114,7 +114,7 @@ export function DataSourceForm({ initialData, onSave, onCancel, theme }: DataSou
 
       <div className="flex gap-2 pt-1">
         <button type="submit"
-          className="flex-1 py-2.5 bg-[#e94560] hover:bg-[#e94560]/85
+          className="flex-1 py-2.5 bg-[#ff0000] hover:bg-[#ff0000]/85
                      text-white text-sm font-medium rounded-xl transition-colors">
           {initialData ? '保存' : '添加'}
         </button>

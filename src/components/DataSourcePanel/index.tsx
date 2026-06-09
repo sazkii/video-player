@@ -174,8 +174,8 @@ export function DataSourcePanel({ isOpen, onClose, onSelect, theme }: DataSource
                 className={`flex-shrink-0 px-2.5 py-1 text-[10px] rounded-full transition-colors
                   ${filterCategory === cat.id
                     ? isDark
-                      ? 'bg-[#e94560]/15 text-[#e94560] font-medium'
-                      : 'bg-[#e94560]/10 text-[#e94560] font-medium'
+                      ? 'bg-[#ff0000]/15 text-[#ff0000] font-medium'
+                      : 'bg-[#ff0000]/10 text-[#ff0000] font-medium'
                     : isDark
                       ? 'text-white/30 hover:text-white/50'
                       : 'text-gray-400 hover:text-gray-600'
@@ -242,7 +242,7 @@ export function DataSourcePanel({ isOpen, onClose, onSelect, theme }: DataSource
           {activeTab === 'custom' ? (
             <button
               onClick={() => { setEditingSource(null); setShowForm(true) }}
-              className="w-full py-2.5 bg-[#e94560] hover:bg-[#e94560]/85
+              className="w-full py-2.5 bg-[#ff0000] hover:bg-[#ff0000]/85
                          text-white text-sm font-medium rounded-xl transition-colors"
             >
               + 添加数据源

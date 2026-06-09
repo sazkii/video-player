@@ -34,12 +34,12 @@ export function DataSourceItem({
       {/* 播放按钮 */}
       <button
         onClick={() => onPlay(source.url)}
-        className="flex-shrink-0 w-10 h-10 bg-[#e94560]/10 hover:bg-[#e94560]/20
+        className="flex-shrink-0 w-10 h-10 bg-[#ff0000]/10 hover:bg-[#ff0000]/20
                    rounded-xl flex items-center justify-center transition-colors mt-0.5"
         title={`播放 ${source.name}`}
       >
         <svg width="14" height="14" viewBox="0 0 100 100" fill="none">
-          <polygon points="35,25 35,75 80,50" fill="#e94560" />
+          <polygon points="35,25 35,75 80,50" fill="#ff0000" />
         </svg>
       </button>
 

@@ -1,82 +1,81 @@
-import type { Theme } from '../types/video'
+import { useLocation } from 'react-router-dom'
 
 interface HeaderProps {
-  theme: Theme
-  onThemeToggle: () => void
-  onDataSourceOpen: () => void
+  query: string
+  onQueryChange: (q: string) => void
+  onSearch: () => void
+  onClearSearch: () => void
+  searched: boolean
+  loading: boolean
 }
 
-export function Header({ theme, onThemeToggle, onDataSourceOpen }: HeaderProps) {
-  const isDark = theme === 'dark'
+export function Header({ query, onQueryChange, onSearch, onClearSearch, searched, loading }: HeaderProps) {
+  const location = useLocation()
+  const isPlayer = location.pathname === '/player'
+
+  if (isPlayer) return null
 
   return (
-    <header className={`sticky top-0 z-30 backdrop-blur-md border-b transition-colors
-      ${isDark
-        ? 'bg-[#0a0a0a]/80 border-white/[0.06]'
-        : 'bg-white/80 border-gray-200/60'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Logo + 导航 */}
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#e94560] rounded-lg flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 100 100" fill="none">
-                <polygon points="38,25 38,75 78,50" fill="white" />
+    <header className="sticky top-0 z-30 bg-[#0f0f0f] border-b border-white/[0.06]">
+      <div className="h-14 flex items-center justify-between px-4 md:px-6 gap-4">
+        {/* 占位 - sidebar 已有 logo */}
+        <div className="hidden md:block w-[72px]" />
+
+        {/* 搜索栏 - YouTube 居中样式 */}
+        <form
+          onSubmit={e => { e.preventDefault(); onSearch() }}
+          className="flex-1 max-w-[640px] mx-auto flex"
+        >
+          <input
+            type="text"
+            value={query}
+            onChange={e => onQueryChange(e.target.value)}
+            placeholder="搜索"
+            className="flex-1 bg-[#121212] border border-[#303030] rounded-l-full px-4 py-2
+                       text-white text-sm placeholder-white/40 outline-none
+                       focus:border-[#1c62b9] transition-colors"
+          />
+          {(query || searched) && (
+            <button
+              type="button"
+              onClick={onClearSearch}
+              className="bg-[#121212] border border-[#303030] border-l-0 px-3
+                         hover:bg-[#303030] transition-colors flex items-center justify-center"
+              title="返回首页"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
               </svg>
-            </div>
-            <span className={`text-base font-semibold tracking-tight
-              ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              Video Player
-            </span>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-1">
-            {['Discover', 'My Playlists', 'Library'].map(item => (
-              <button
-                key={item}
-                className={`px-3 py-1.5 text-sm rounded-lg transition-colors
-                  ${item === 'Discover'
-                    ? isDark ? 'text-white font-medium' : 'text-gray-900 font-medium'
-                    : isDark ? 'text-white/40 hover:text-white/70' : 'text-gray-400 hover:text-gray-700'
-                  }`}
-              >
-                {item}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* 操作按钮 */}
-        <div className="flex items-center gap-2">
+            </button>
+          )}
           <button
-            onClick={onDataSourceOpen}
-            className={`h-9 px-4 rounded-full flex items-center gap-2 transition-all text-sm
-              ${isDark
-                ? 'bg-white/[0.08] hover:bg-white/[0.14] text-white/80 hover:text-white'
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
-              }`}
-            title="数据源配置"
+            type="submit"
+            disabled={loading}
+            className="bg-[#222222] border border-l-0 border-[#303030] rounded-r-full px-6
+                       hover:bg-[#303030] transition-colors flex items-center justify-center
+                       disabled:opacity-50"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-              <line x1="12" y1="22.08" x2="12" y2="12" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+              <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
             </svg>
-            <span className="hidden sm:inline">数据源</span>
+          </button>
+        </form>
+
+        {/* 右侧操作 */}
+        <div className="flex items-center gap-1">
+          {/* 主题切换 */}
+          <button
+            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+            title="切换主题"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+              <path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
+            </svg>
           </button>
 
-          <button
-            onClick={onThemeToggle}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all
-              ${isDark
-                ? 'bg-white/[0.08] hover:bg-white/[0.14] text-white/70 hover:text-white'
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800'
-              }`}
-            title={isDark ? '切换到亮色主题' : '切换到暗色主题'}
-          >
-            {isDark ? '☀' : '☽'}
+          {/* 头像 */}
+          <button className="w-8 h-8 rounded-full bg-[#5c4dff] flex items-center justify-center text-xs font-medium text-white ml-1">
+            U
           </button>
         </div>
       </div>

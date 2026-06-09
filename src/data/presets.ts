@@ -26,12 +26,12 @@ export const PRESET_DATA_SOURCES: DataSource[] = [
   },
   {
     id: 'preset-archive-sintel',
-    name: 'Sintel',
-    url: 'https://archive.org/download/Sintel/sintel.mp4',
+    name: 'Big Buck Bunny 1080p',
+    url: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_30MB.mp4',
     category: 'mp4',
     format: 'mp4',
-    description: 'Archive.org 提供，Blender Foundation VFX 动画短片',
-    resolution: '720p',
+    description: '高清 1080p 测试视频，30MB，适合测试高分辨率播放',
+    resolution: '1080p',
   },
   {
     id: 'preset-archive-tears',

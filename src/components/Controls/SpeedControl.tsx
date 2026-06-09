@@ -31,7 +31,7 @@ export function SpeedControl({ playbackRate, playbackRates, onRateChange }: Spee
         title="播放速度"
       >
         {playbackRate !== 1 && (
-          <span className="text-[#e94560] text-xs font-medium">{playbackRate}x</span>
+          <span className="text-[#ff0000] text-xs font-medium">{playbackRate}x</span>
         )}
         {playbackRate === 1 && (
           <span className="text-[12px]">倍速</span>
@@ -49,7 +49,7 @@ export function SpeedControl({ playbackRate, playbackRates, onRateChange }: Spee
                 setIsOpen(false)
               }}
               className={`w-full px-3 py-1.5 text-[13px] text-left hover:bg-white/10 transition-colors
-                ${rate === playbackRate ? 'text-[#e94560] font-medium' : 'text-white/70'}`}
+                ${rate === playbackRate ? 'text-[#ff0000] font-medium' : 'text-white/70'}`}
             >
               {rate}x {rate === 1 && <span className="text-white/30 text-[11px]">正常</span>}
             </button>

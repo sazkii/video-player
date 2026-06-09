@@ -18,6 +18,7 @@ export function Controls({ player, visible }: ControlsProps) {
     <div
       className={`absolute bottom-0 left-0 right-0 transition-all duration-300
                   ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+      onClick={(e) => e.stopPropagation()}
     >
       {/* 渐变背景 */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
@@ -48,7 +49,7 @@ export function Controls({ player, visible }: ControlsProps) {
 
           <div className="flex items-center gap-0.5">
             {player.playbackRate !== 1 && (
-              <span className="text-[11px] text-[#e94560] font-mono mr-1 font-medium">
+              <span className="text-[11px] text-[#ff0000] font-mono mr-1 font-medium">
                 {player.playbackRate}x
               </span>
             )}

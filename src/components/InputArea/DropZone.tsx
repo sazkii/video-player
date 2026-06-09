@@ -49,7 +49,7 @@ export function DropZone({ theme, onFileSelect }: DropZoneProps) {
       onDrop={handleDrop}
       className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer
         ${isDragOver
-          ? 'border-[#e94560] bg-[#e94560]/5'
+          ? 'border-[#ff0000] bg-[#ff0000]/5'
           : isDark
             ? 'border-white/10 hover:border-white/25 bg-white/[0.02]'
             : 'border-gray-200 hover:border-gray-300 bg-gray-50'

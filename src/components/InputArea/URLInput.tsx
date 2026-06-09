@@ -50,14 +50,14 @@ export function URLInput({ theme, onSubmit }: URLInputProps) {
           className={`flex-1 px-4 py-3 border rounded-xl text-sm transition-colors
             focus:outline-none
             ${isDark
-              ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-[#e94560]/50'
-              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-[#e94560]/50'
+              ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-[#ff0000]/50'
+              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-[#ff0000]/50'
             }`}
         />
         <button
           type="submit"
           disabled={!url.trim()}
-          className="px-6 py-3 bg-[#e94560] hover:bg-[#e94560]/80 disabled:opacity-40
+          className="px-6 py-3 bg-[#ff0000] hover:bg-[#ff0000]/80 disabled:opacity-40
                      disabled:cursor-not-allowed text-white font-medium rounded-xl
                      transition-colors text-sm whitespace-nowrap"
         >

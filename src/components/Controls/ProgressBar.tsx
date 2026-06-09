@@ -85,7 +85,7 @@ export function ProgressBar({ currentTime, duration, buffered, onSeek }: Progres
         />
         {/* 播放进度 */}
         <div
-          className="absolute h-full bg-[#e94560] rounded-full transition-none"
+          className="absolute h-full bg-[#ff0000] rounded-full transition-none"
           style={{ width: `${progress}%` }}
         />
         {/* 拖拽手柄 */}
