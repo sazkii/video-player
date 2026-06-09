@@ -1,10 +1,12 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import { SearchProvider, useSearchState } from './context/SearchContext'
-import { searchVideos } from './services/api'
+import { AnimatePresence, motion } from 'motion/react'
+import { searchVideos } from '@/lib/api'
 import { BottomNav, SideNav } from './components/Navigation'
 import { Header } from './components/Header'
-import { useMediaQuery } from './hooks/useMediaQuery'
+import { useUIStore } from './stores/ui.store'
+import { TooltipProvider } from './components/ui/tooltip'
+import { pageTransition } from './lib/animations'
 import HomePage from './pages/HomePage'
 import DetailPage from './pages/DetailPage'
 import PlayerPage from './pages/PlayerPage'
@@ -12,72 +14,111 @@ import FavoritesPage from './pages/FavoritesPage'
 import HistoryPage from './pages/HistoryPage'
 import SettingsPage from './pages/SettingsPage'
 
+/** 包装路由元素，添加页面过渡动画 */
+function AnimatedRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      variants={pageTransition}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 function AppInner() {
-  const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const { sidebarExpanded, toggleSidebar, isMobile, setMobile } = useUIStore()
   const navigate = useNavigate()
   const location = useLocation()
-  const { searchState, setQuery, setResults, setLoading, setSearched } = useSearchState()
+  const [headerQuery, setHeaderQuery] = useState('')
+  const [submittedQuery, setSubmittedQuery] = useState('')
+  const [headerSearched, setHeaderSearched] = useState(false)
+  const [headerLoading, setHeaderLoading] = useState(false)
   const isPlayer = location.pathname === '/player'
-  const isDesktop = useMediaQuery('(min-width: 768px)')
+
+  // 移动端检测
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [setMobile])
 
   const handleSearch = useCallback(async () => {
-    if (!searchState.query.trim()) return
-    setLoading(true)
-    setSearched(true)
+    if (!headerQuery.trim()) return
+    setHeaderLoading(true)
+    setHeaderSearched(true)
+    setSubmittedQuery(headerQuery)
     navigate('/')
     try {
-      const res = await searchVideos(searchState.query)
-      if (res.success) setResults(res.results)
+      await searchVideos(headerQuery)
     } catch {
       console.error('搜索失败')
     } finally {
-      setLoading(false)
+      setHeaderLoading(false)
     }
-  }, [searchState.query, setLoading, setResults, setSearched, navigate])
+  }, [headerQuery, navigate])
 
   const handleClearSearch = useCallback(() => {
-    setQuery('')
-    setResults([])
-    setSearched(false)
+    setHeaderQuery('')
+    setSubmittedQuery('')
+    setHeaderSearched(false)
     navigate('/')
-  }, [setQuery, setResults, setSearched, navigate])
+  }, [navigate])
 
   // 播放页：全屏沉浸式，不渲染侧边栏和顶栏
   if (isPlayer) {
     return (
       <div className="min-h-screen bg-black">
-        <Routes>
-          <Route path="/player" element={<PlayerPage />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key="player"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Routes location={location}>
+              <Route path="/player" element={<PlayerPage />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
       </div>
     )
   }
+
+  const isDesktop = !isMobile
+  const mainMarginLeft = isDesktop ? (sidebarExpanded ? 240 : 72) : 0
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <SideNav
         expanded={sidebarExpanded}
-        onToggle={() => setSidebarExpanded(prev => !prev)}
+        onToggle={toggleSidebar}
       />
       <div
         className="flex-1 flex flex-col min-w-0 transition-all duration-200"
-        style={{ marginLeft: isDesktop ? (sidebarExpanded ? 240 : 72) : 0 }}
+        style={{ marginLeft: mainMarginLeft }}
       >
         <Header
-          query={searchState.query}
-          onQueryChange={setQuery}
+          query={headerQuery}
+          onQueryChange={setHeaderQuery}
           onSearch={handleSearch}
           onClearSearch={handleClearSearch}
-          searched={searchState.searched}
-          loading={searchState.loading}
+          searched={headerSearched}
+          loading={headerLoading}
         />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/detail" element={<DetailPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<AnimatedRoute><HomePage submittedQuery={submittedQuery} /></AnimatedRoute>} />
+            <Route path="/detail" element={<AnimatedRoute><DetailPage /></AnimatedRoute>} />
+            <Route path="/favorites" element={<AnimatedRoute><FavoritesPage /></AnimatedRoute>} />
+            <Route path="/history" element={<AnimatedRoute><HistoryPage /></AnimatedRoute>} />
+            <Route path="/settings" element={<AnimatedRoute><SettingsPage /></AnimatedRoute>} />
+          </Routes>
+        </AnimatePresence>
       </div>
       <BottomNav />
     </div>
@@ -87,9 +128,9 @@ function AppInner() {
 export default function App() {
   return (
     <BrowserRouter>
-      <SearchProvider>
+      <TooltipProvider delayDuration={300}>
         <AppInner />
-      </SearchProvider>
+      </TooltipProvider>
     </BrowserRouter>
   )
 }

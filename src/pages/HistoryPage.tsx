@@ -1,18 +1,5 @@
-import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getHistory } from '../services/api'
-
-interface HistoryItem {
-  id: number
-  site_id: string
-  title: string
-  url: string
-  poster: string | null
-  episode_name: string | null
-  current_time: number
-  duration: number
-  updated_at: string
-}
+import { useHistory } from '@/hooks/queries/useHistory'
 
 function formatDuration(s: number): string {
   if (!s || !isFinite(s)) return ''
@@ -33,31 +20,23 @@ function timeAgo(dateStr: string): string {
 
 export default function HistoryPage() {
   const navigate = useNavigate()
-  const [history, setHistory] = useState<HistoryItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data, isLoading } = useHistory()
+  const history = data?.history ?? []
 
-  useEffect(() => {
-    getHistory()
-      .then(res => {
-        if (res.success) setHistory(res.history)
-      })
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#ff0000]/60 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-accent/60 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white px-4 md:px-10 py-8">
+    <div className="min-h-screen bg-background text-white px-4 md:px-10 py-8">
       <h1 className="text-2xl font-bold mb-6">观看历史</h1>
 
       {history.length === 0 ? (
-        <p className="text-[#aaa] text-center py-16">还没有观看记录</p>
+        <p className="text-text-secondary text-center py-16">还没有观看记录</p>
       ) : (
         <div className="space-y-2">
           {history.map(item => {
@@ -72,10 +51,10 @@ export default function HistoryPage() {
                     state: { url: item.url, siteId: item.site_id, title: item.title },
                   })
                 }
-                className="w-full flex items-center gap-4 bg-transparent hover:bg-[#272727]
+                className="w-full flex items-center gap-4 bg-transparent hover:bg-surface-4
                            rounded-xl p-3 transition-colors text-left"
               >
-                <div className="w-[160px] aspect-video rounded-lg overflow-hidden flex-shrink-0 bg-[#1a1a1a]">
+                <div className="w-[160px] aspect-video rounded-lg overflow-hidden flex-shrink-0 bg-surface-2">
                   {item.poster ? (
                     <img src={item.poster} alt="" className="w-full h-full object-cover" loading="lazy" />
                   ) : (

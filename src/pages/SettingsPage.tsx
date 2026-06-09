@@ -1,36 +1,28 @@
-import { useState, useEffect } from 'react'
-import { getSites, toggleSite } from '../services/api'
-
-interface Site {
-  id: string
-  name: string
-  enabled: boolean
-}
+import { useQueryClient } from '@tanstack/react-query'
+import { useSites } from '@/hooks/queries/useSites'
+import { toggleSite } from '@/lib/api'
+import { Settings } from 'lucide-react'
 
 export default function SettingsPage() {
-  const [sites, setSites] = useState<Site[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    getSites()
-      .then(res => {
-        if (res.success) setSites(res.sites)
-      })
-      .finally(() => setLoading(false))
-  }, [])
+  const { data, isLoading } = useSites()
+  const qc = useQueryClient()
+  const sites = data?.sites ?? []
 
   const handleToggle = async (id: string, enabled: boolean) => {
     await toggleSite(id, enabled)
-    setSites(prev => prev.map(s => (s.id === id ? { ...s, enabled } : s)))
+    qc.invalidateQueries({ queryKey: ['sites'] })
   }
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white px-4 md:px-10 py-8">
-      <h1 className="text-2xl font-bold mb-8">设置</h1>
+      <h1 className="text-2xl font-bold mb-8 flex items-center gap-2">
+        <Settings size={24} />
+        设置
+      </h1>
 
       <section className="mb-8">
         <h2 className="text-base font-semibold mb-4 text-[#f1f1f1]">数据源管理</h2>
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center py-8">
             <div className="w-6 h-6 border-2 border-[#ff0000]/60 border-t-transparent rounded-full animate-spin" />
           </div>
